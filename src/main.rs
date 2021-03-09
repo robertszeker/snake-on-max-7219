@@ -9,17 +9,12 @@ use termion::async_stdin;
 
 const NUMBER_DISPLAYS: usize = 4;
 const DISPLAY_SIZE: u8 = 8;
+const DATA_PIN: u32 = 10;
+const CS_PIN: u32 = 8;
+const CLK_PIN: u32 = 11;
 
 fn init_display() -> Max7219 {
-
-    let data_pin = 10; 
-    let cs_pin = 8; 
-    let clk_pin = 11;
-
-    println!("data={}, cs={}, clk={}", data_pin, cs_pin, clk_pin);
-
-    let mut display = setup("/dev/gpiochip0", NUMBER_DISPLAYS, data_pin, cs_pin, clk_pin);
-    println!("prepare_display");
+    let mut display = setup("/dev/gpiochip0", NUMBER_DISPLAYS, DATA_PIN, CS_PIN, CLK_PIN);
     prepare_display(&mut display, NUMBER_DISPLAYS, 0x0F);
     return display;   
 }
