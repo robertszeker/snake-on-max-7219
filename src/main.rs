@@ -78,11 +78,9 @@ impl Point {
 
 fn main() {
     let mut display = init_display();
-    let args: Vec<String> = std::env::args().collect();
-
     let mut point = Point {
-        x: args[1].parse::<u8>().unwrap(),
-        y: args[2].parse::<u8>().unwrap(),
+        x: 31,
+        y: 4,
     };
 
     let stdout = stdout();
@@ -126,7 +124,7 @@ fn main() {
         }
 
         for i in 0..NUMBER_DISPLAYS {
-            display.write_raw(i, &point.get_byte_rows_for_display(i));
+            display.write_raw(i, &point.get_byte_rows_for_display(i)).expect("couldn't write to display");
         }
     
         thread::sleep(Duration::from_millis(100));
