@@ -25,6 +25,13 @@ struct Point {
     y: u8,
 }
 
+enum Direction {
+    Left,
+    Right,
+    Up,
+    Down,
+}
+
 impl Point {
     fn get_byte_rows_for_display(&self, display_index: usize) -> [u8; 8] {
         let byte_row = 0b00000000;
@@ -86,41 +93,33 @@ fn main() {
     let stdout = stdout();
     let mut _stdout = stdout.lock().into_raw_mode().unwrap();
     let mut stdin = async_stdin().bytes();
-    let mut direction = "left";
+    let mut direction = Direction::Left;
 
     loop {
-
-        let b = stdin.next();
-
-        if let Some(Ok(27)) = b {
-            let b = stdin.next();
-            if let Some(Ok(91)) = b {
-                let b = stdin.next();
-
-                if let Some(Ok(65)) = b {
-                    direction = "up";
-                } else if let Some(Ok(66)) = b {
-                    direction = "down";
-                } else if let Some(Ok(67)) = b {
-                    direction = "right";
-                } else if let Some(Ok(68)) = b {
-                    direction = "left";
+        direction = match stdin.next() {
+            Some(Ok(27)) => {
+                match stdin.next() {
+                    Some(Ok(91)) => {
+                        match stdin.next() {
+                            Some(Ok(65)) => Direction::Up,
+                            Some(Ok(66)) => Direction::Down,
+                            Some(Ok(67)) => Direction::Right,
+                            Some(Ok(68)) => Direction::Left,
+                            _ => direction,
+                        }
+                    }
+                    _ => direction,
                 }
-            }
-        }
+            },
+            Some(Ok(b'q')) => break,
+            _ => direction,
+        };
 
-        if let Some(Ok(b'q')) = b {
-            break;
-        }
-
-        if direction == "left" {
-            point.move_left();
-        } else if direction == "up" {
-            point.move_up();
-        } else if direction == "down" {
-            point.move_down();
-        } else if direction == "right" {
-            point.move_right();
+        match direction {
+            Direction::Left => point.move_left(),
+            Direction::Right => point.move_right(),
+            Direction::Up => point.move_up(),
+            Direction::Down => point.move_down(),
         }
 
         for i in 0..NUMBER_DISPLAYS {
