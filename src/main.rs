@@ -39,7 +39,7 @@ impl Snake {
         let byte_row: u8 = 0b00000000;
         let mut byte_rows = [byte_row; 8];
 
-        for point in self.tail {
+        for point in self.tail.iter() {
             for byte_row_index in 0..8 {
                 byte_rows[byte_row_index] = point.get_byte_rows_for_display(display_index)[byte_row_index] & byte_rows[byte_row_index];
             }
