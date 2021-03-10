@@ -25,6 +25,7 @@ struct Point {
     y: u8,
 }
 
+#[derive(Debug)]
 struct Snake {
     direction: Direction,
     tail: Vec<Point>,
@@ -41,10 +42,9 @@ impl Snake {
 
         for point in self.tail.iter() {
             for byte_row_index in 0..8 {
-                byte_rows[byte_row_index] = point.get_byte_rows_for_display(display_index)[byte_row_index] & byte_rows[byte_row_index];
+                byte_rows[byte_row_index] = point.get_byte_rows_for_display(display_index)[byte_row_index] | byte_rows[byte_row_index];
             }
         }
-
         byte_rows
     }
 
@@ -62,6 +62,7 @@ impl Snake {
     }
 }
 
+#[derive(Debug)]
 enum Direction {
     Left,
     Right,
@@ -159,7 +160,7 @@ fn main() {
             _ => (),
         };
 
-        // snake.walk();
+        snake.walk();
 
         for i in 0..NUMBER_DISPLAYS {
             // display.write_raw(i, &point.get_byte_rows_for_display(i)).expect("couldn't write to display");
