@@ -36,18 +36,6 @@ impl Snake {
         self.direction = direction;
     }
 
-    fn get_byte_rows_for_display(&self, display_index: usize) -> [u8; 8] {
-        let byte_row: u8 = 0b00000000;
-        let mut byte_rows = [byte_row; 8];
-
-        for point in self.tail.iter() {
-            for byte_row_index in 0..8 {
-                byte_rows[byte_row_index] = point.get_byte_rows_for_display(display_index)[byte_row_index] | byte_rows[byte_row_index];
-            }
-        }
-        byte_rows
-    }
-
     fn walk(&mut self) -> () {
         let mut head = Point{..self.tail[0]};
         match self.direction {
@@ -71,23 +59,6 @@ enum Direction {
 }
 
 impl Point {
-    fn get_byte_rows_for_display(&self, display_index: usize) -> [u8; 8] {
-        let byte_row = 0b00000000;
-        let empty_byte_rows = [byte_row; 8];
-
-        let actual_display_index = usize::from(self.x) / usize::from(DISPLAY_SIZE);
-        if actual_display_index != display_index {
-            return empty_byte_rows;
-        }
-
-        let mut byte_rows = empty_byte_rows;
-        let column_number = self.x % DISPLAY_SIZE;
-        let byte_row = 0b10000000 >> column_number;
-        let byte_rows_index = 7 - usize::from(self.y);
-        byte_rows[byte_rows_index] = byte_row;
-        return byte_rows;
-    }
-
     fn move_left(&mut self) -> () {
         if self.x == 0 {
             self.x = u8::try_from(NUMBER_DISPLAYS).unwrap() * DISPLAY_SIZE;
@@ -121,8 +92,44 @@ impl Point {
     }
 }
 
+struct DisplayByteRowCalculator {
+
+}
+
+impl DisplayByteRowCalculator {
+    fn get_byte_rows_for_snake(&self, snake: &Snake, display_index: usize) -> [u8; 8] {
+        let byte_row: u8 = 0b00000000;
+        let mut byte_rows = [byte_row; 8];
+
+        for point in snake.tail.iter() {
+            for byte_row_index in 0..8 {
+                byte_rows[byte_row_index] = self.get_byte_rows_for_point(&point, display_index)[byte_row_index] | byte_rows[byte_row_index];
+            }
+        }
+        byte_rows
+    }
+
+    fn get_byte_rows_for_point(&self, point: &Point, display_index: usize) -> [u8; 8] {
+        let byte_row = 0b00000000;
+        let empty_byte_rows = [byte_row; 8];
+
+        let actual_display_index = usize::from(point.x) / usize::from(DISPLAY_SIZE);
+        if actual_display_index != display_index {
+            return empty_byte_rows;
+        }
+
+        let mut byte_rows = empty_byte_rows;
+        let column_number = point.x % DISPLAY_SIZE;
+        let byte_row = 0b10000000 >> column_number;
+        let byte_rows_index = 7 - usize::from(point.y);
+        byte_rows[byte_rows_index] = byte_row;
+        return byte_rows;
+    }
+}
+
 fn main() {
     let mut display = init_display();
+    let display_calculator = DisplayByteRowCalculator {};
 
     let point1 = Point { x: 8, y: 4 };
     let point2 = Point { x: 9, y: 4 };
@@ -163,8 +170,10 @@ fn main() {
         snake.walk();
 
         for i in 0..NUMBER_DISPLAYS {
-            // display.write_raw(i, &point.get_byte_rows_for_display(i)).expect("couldn't write to display");
-            display.write_raw(i, &snake.get_byte_rows_for_display(i)).expect("couldn't write to display");
+            display.write_raw(
+                i,
+                &display_calculator.get_byte_rows_for_snake(&snake, i),
+            ).expect("couldn't write to display");
         }
     
         thread::sleep(Duration::from_millis(100));
