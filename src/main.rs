@@ -29,11 +29,15 @@ mod types {
 
         #[derive(Debug)]
         pub struct Snake {
-            pub direction: Direction,
+            direction: Direction,
             pub tail: Vec<Point>,
         }
 
         impl Snake {
+            pub fn init(tail: Vec<Point>) -> Snake {
+                Snake {tail, direction: Direction::Left}
+            }
+
             pub fn change_direction(&mut self, direction: Direction) -> () {
                 self.direction = direction;
             }
@@ -148,7 +152,7 @@ mod display {
         }
     }
 
-    pub fn init_display() -> crate::display::Display {
+    pub fn init() -> Display {
         let mut max7219 = setup("/dev/gpiochip0", crate::NUMBER_DISPLAYS, crate::DATA_PIN, crate:: CS_PIN, crate::CLK_PIN);
         prepare_display(&mut max7219, crate::NUMBER_DISPLAYS, 0x0F);
         return Display { max7219 };
@@ -156,19 +160,14 @@ mod display {
 }
 
 fn main() {
-    let mut display = crate::display::init_display();
-
-    let point1 = Point { x: 8, y: 4 };
-    let point2 = Point { x: 9, y: 4 };
-    let point3 = Point { x: 10, y: 4 };
-    let mut snake = Snake {
-        direction: Direction::Left,
-        tail: vec![
-            point1,
-            point2,
-            point3,
-        ],
-    };
+    let mut display = crate::display::init();
+    let mut snake = Snake::init(
+        vec![
+            Point { x: 8, y: 4 },
+            Point { x: 9, y: 4 },
+            Point { x: 10, y: 4 },
+        ]
+    );
 
     let stdout = stdout();
     let mut _stdout = stdout.lock().into_raw_mode().unwrap();
