@@ -1,10 +1,9 @@
 mod display;
+mod input;
 mod types;
 
-use std::io::Read;
 use std::{thread, time::Duration};
-use termion::async_stdin;
-use types::{point::Point, snake::Snake, Direction};
+use types::{point::Point, snake::Snake};
 
 const NUMBER_DISPLAYS: usize = 4;
 const DISPLAY_SIZE: u8 = 8;
@@ -20,23 +19,16 @@ fn main() {
         Point { x: 10, y: 4 },
     ]);
 
-    let mut stdin = async_stdin().bytes();
+    let mut input = input::Input::init();
 
     loop {
-        match stdin.next() {
-            Some(Ok(27)) => match stdin.next() {
-                Some(Ok(91)) => match stdin.next() {
-                    Some(Ok(65)) => snake.change_direction(Direction::Up),
-                    Some(Ok(66)) => snake.change_direction(Direction::Down),
-                    Some(Ok(67)) => snake.change_direction(Direction::Right),
-                    Some(Ok(68)) => snake.change_direction(Direction::Left),
-                    _ => (),
-                },
-                _ => (),
-            },
-            Some(Ok(b'q')) => break,
+        match input.next() {
+            Some(input::Command::ChangeDirection { direction }) => {
+                snake.change_direction(direction)
+            }
+            Some(input::Command::Break) => break,
             _ => (),
-        };
+        }
 
         snake.walk();
         display.write(&snake);
