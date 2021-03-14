@@ -7,6 +7,9 @@ pub struct Snake {
     pub tail: Vec<Point>,
 }
 
+const HORIZONTAL_DIRECTION: [Direction; 2] = [Direction::Left, Direction::Right];
+const VERTICAL_DIRECTION: [Direction; 2] = [Direction::Up, Direction::Down];
+
 impl Snake {
     pub fn init(tail: Vec<Point>) -> Snake {
         Snake {
@@ -15,8 +18,20 @@ impl Snake {
         }
     }
 
-    pub fn change_direction(&mut self, direction: Direction) -> () {
-        self.direction = direction;
+    pub fn change_direction(&mut self, new_direction: Direction) -> () {
+        if HORIZONTAL_DIRECTION.contains(&self.direction)
+            && HORIZONTAL_DIRECTION.contains(&new_direction)
+        {
+            return;
+        }
+
+        if VERTICAL_DIRECTION.contains(&self.direction)
+            && VERTICAL_DIRECTION.contains(&new_direction)
+        {
+            return;
+        }
+
+        self.direction = new_direction;
     }
 
     pub fn walk(&mut self) -> () {

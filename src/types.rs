@@ -1,7 +1,7 @@
 pub mod point;
 pub mod snake;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Direction {
     Left,
     Right,

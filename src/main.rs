@@ -22,7 +22,6 @@ fn main() {
         Point { x: 10, y: 4 },
     ]);
 
-
     let stdout = stdout();
     let _stdout = stdout.lock().into_raw_mode().unwrap();
     let mut input = input::Input::init();
