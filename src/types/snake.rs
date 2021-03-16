@@ -1,22 +1,16 @@
 use super::point::Point;
 use super::Direction;
-use std::fmt;
+
+pub enum Status {
+    Walking,
+    Eating,
+    GameOver(usize),
+}
 
 #[derive(Debug)]
 pub struct Snake {
     direction: Direction,
     pub tail: Vec<Point>,
-}
-
-#[derive(Debug)]
-pub struct GameOver {
-    score: usize,
-}
-
-impl fmt::Display for GameOver {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "game over with score: {}", self.score)
-    }
 }
 
 const HORIZONTAL_DIRECTION: [Direction; 2] = [Direction::Left, Direction::Right];
@@ -46,7 +40,7 @@ impl Snake {
         self.direction = new_direction;
     }
 
-    pub fn walk(&mut self) -> Result<(), GameOver> {
+    pub fn walk(&mut self, mouse: &Point) -> Status {
         let mut head = Point { ..self.tail[0] };
         match self.direction {
             Direction::Left => head.move_left(),
@@ -55,14 +49,19 @@ impl Snake {
             Direction::Down => head.move_down(),
         };
 
-        self.tail.pop().expect("could not remove last element");
+        if head.eq(mouse) {
+            self.tail.splice(0..0, vec![head].iter().copied());
+            return Status::Eating;
+        } else {
+            self.tail.pop().expect("could not remove last element");
+        }
 
         if self.tail.contains(&head) {
-            return Err(GameOver{score: self.tail.len()});
+            return Status::GameOver(self.tail.len());
         }
 
         self.tail.splice(0..0, vec![head].iter().copied());
 
-        Ok(())
+        Status::Walking
     }
 }

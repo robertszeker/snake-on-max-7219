@@ -1,15 +1,13 @@
-use std::convert::TryFrom;
-
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Point {
-    pub x: u8,
-    pub y: u8,
+    pub x: usize,
+    pub y: usize,
 }
 
 impl Point {
     pub fn move_left(&mut self) -> () {
         if self.x == 0 {
-            self.x = u8::try_from(crate::NUMBER_DISPLAYS).unwrap() * crate::DISPLAY_SIZE;
+            self.x = crate::NUMBER_DISPLAYS * crate::DISPLAY_SIZE;
         }
 
         self.x = self.x - 1;
@@ -32,7 +30,7 @@ impl Point {
     }
 
     pub fn move_right(&mut self) -> () {
-        if self.x == (u8::try_from(crate::NUMBER_DISPLAYS).unwrap() * crate::DISPLAY_SIZE - 1) {
+        if self.x == crate::NUMBER_DISPLAYS * crate::DISPLAY_SIZE - 1 {
             self.x = 0;
         } else {
             self.x = self.x + 1;
