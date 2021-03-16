@@ -65,7 +65,7 @@ fn main() {
                 break;
             }
         }
-        display.write(&snake, &mouse);
+        display.write(vec![&snake, &mouse]);
 
         thread::sleep(Duration::from_millis(100));
     }

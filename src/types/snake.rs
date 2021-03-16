@@ -1,5 +1,6 @@
 use super::point::Point;
 use super::Direction;
+use crate::display::{DisplayTrait, empty_bytes};
 
 pub enum Status {
     Walking,
@@ -15,6 +16,18 @@ pub struct Snake {
 
 const HORIZONTAL_DIRECTION: [Direction; 2] = [Direction::Left, Direction::Right];
 const VERTICAL_DIRECTION: [Direction; 2] = [Direction::Up, Direction::Down];
+
+impl DisplayTrait for Snake {
+    fn get_bytes(&self, display_index: usize) -> [u8; 8] {
+        let mut byte_rows = empty_bytes();
+        for point in self.tail.iter() {
+            for byte_row_index in 0..8 {
+                byte_rows[byte_row_index] |= &point.get_bytes(display_index)[byte_row_index];
+            }
+        }
+        byte_rows
+    }
+}
 
 impl Snake {
     pub fn init(tail: Vec<Point>) -> Snake {
