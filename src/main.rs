@@ -20,6 +20,10 @@ fn main() {
         Point { x: 8, y: 4 },
         Point { x: 9, y: 4 },
         Point { x: 10, y: 4 },
+        Point { x: 10, y: 4 },
+        Point { x: 10, y: 4 },
+        Point { x: 10, y: 4 },
+        Point { x: 10, y: 4 },
     ]);
 
     let stdout = stdout();
@@ -35,7 +39,13 @@ fn main() {
             _ => (),
         }
 
-        snake.walk();
+        match snake.walk() {
+            Ok(_) => {}
+            Err(game_over) => {
+                println!("{}", game_over);
+                break;
+            }
+        }
         display.write(&snake);
 
         thread::sleep(Duration::from_millis(100));

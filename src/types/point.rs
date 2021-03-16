@@ -1,6 +1,6 @@
 use std::convert::TryFrom;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Point {
     pub x: u8,
     pub y: u8,
