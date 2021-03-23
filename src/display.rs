@@ -1,9 +1,8 @@
+use crate::{DISPLAY_SIZE, NUMBER_DISPLAYS};
 use max_7219_led_matrix_util::{
     prepare_display,
     setup::{setup, Max7219},
 };
-use crate::DISPLAY_SIZE;
-
 
 pub trait DisplayTrait {
     fn get_bytes(&self, display_index: usize) -> [u8; 8];
@@ -19,16 +18,26 @@ pub fn empty_bytes() -> [u8; 8] {
 }
 
 impl Display {
-    pub fn write(&mut self, objects: Vec<&dyn DisplayTrait>) -> () {
-        for display_index in 0..crate::NUMBER_DISPLAYS {
+    pub fn write_overlapping_objects(&mut self, objects: Vec<&dyn DisplayTrait>) -> () {
+        for display_index in 0..NUMBER_DISPLAYS {
             let mut bytes = empty_bytes();
             for object in objects.iter() {
-                for (bytes_index, object_bytes) in object.get_bytes(display_index).iter().enumerate() {
+                for (bytes_index, object_bytes) in
+                    object.get_bytes(display_index).iter().enumerate()
+                {
                     bytes[bytes_index] |= object_bytes;
                 }
             }
             self.max7219
                 .write_raw(display_index, &bytes)
+                .expect("couldn't write to display");
+        }
+    }
+
+    pub fn write_text(&mut self, object: &dyn DisplayTrait) -> () {
+        for display_index in 0..NUMBER_DISPLAYS {
+            self.max7219
+                .write_raw(display_index, &object.get_bytes(display_index))
                 .expect("couldn't write to display");
         }
     }

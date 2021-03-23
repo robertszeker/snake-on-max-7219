@@ -1,17 +1,19 @@
 use super::point::Point;
+use super::score::Score;
 use super::Direction;
-use crate::display::{DisplayTrait, empty_bytes};
+use crate::display::{empty_bytes, DisplayTrait};
 
 pub enum Status {
     Walking,
     Eating,
-    GameOver(usize),
+    GameOver(Score),
 }
 
 #[derive(Debug)]
 pub struct Snake {
     direction: Direction,
     pub tail: Vec<Point>,
+    initial_length: usize,
 }
 
 const HORIZONTAL_DIRECTION: [Direction; 2] = [Direction::Left, Direction::Right];
@@ -32,6 +34,7 @@ impl DisplayTrait for Snake {
 impl Snake {
     pub fn init(tail: Vec<Point>) -> Snake {
         Snake {
+            initial_length: tail.len(),
             tail,
             direction: Direction::Left,
         }
@@ -70,7 +73,9 @@ impl Snake {
         }
 
         if self.tail.contains(&head) {
-            return Status::GameOver(self.tail.len());
+            return Status::GameOver(Score {
+                score: self.tail.len() + 1 - self.initial_length,
+            });
         }
 
         self.tail.splice(0..0, vec![head].iter().copied());

@@ -1,4 +1,5 @@
 pub mod point;
+pub mod score;
 pub mod snake;
 
 #[derive(Debug, PartialEq)]

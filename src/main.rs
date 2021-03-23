@@ -1,13 +1,16 @@
-mod display;
-mod input;
-mod types;
+use std::io::stdout;
+use std::{thread, time::Duration};
 
 use rand::rngs::ThreadRng;
 use rand::Rng;
-use std::io::stdout;
-use std::{thread, time::Duration};
 use termion::raw::IntoRawMode;
+
 use types::{point::Point, snake::Snake, snake::Status};
+
+mod display;
+mod encoding;
+mod input;
+mod types;
 
 const NUMBER_DISPLAYS: usize = 4;
 const DISPLAY_SIZE: usize = 8;
@@ -61,11 +64,11 @@ fn main() {
                 mouse = generate_mouse(&mut rand::thread_rng(), &snake.tail);
             }
             Status::GameOver(score) => {
-                println!("game over with score: {}", score);
+                display.write_text(&score);
                 break;
             }
         }
-        display.write(vec![&snake, &mouse]);
+        display.write_overlapping_objects(vec![&snake, &mouse]);
 
         thread::sleep(Duration::from_millis(100));
     }
